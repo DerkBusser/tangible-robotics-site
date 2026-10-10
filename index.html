@@ -442,8 +442,11 @@
       <p>Tell us what you own. We'll show you what's really going on up there. Before the roof does.</p>
     </div>
     <div>
-      <form id="scanForm" novalidate>
+      <form id="scanForm" action="https://formspree.io/f/xzedgejb" method="POST" novalidate>
         <input type="email" id="scanEmail" name="email" placeholder="you@company.com" aria-label="Work email" autocomplete="email" required>
+        <input type="hidden" name="_subject" value="New scan request from tangible.derk.dev">
+        <input type="hidden" name="source" value="tangible.derk.dev · Scan your portfolio">
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
         <button class="btn btn--light" type="submit"><span class="dot"></span>Request a scan</button>
       </form>
       <div class="msg" id="scanMsg" role="status" aria-live="polite"></div>
@@ -493,16 +496,28 @@
     }
   })();
 
-  // CTA form: front-end stub; wire to n8n/CRM later
+  // CTA form: posts to Formspree via AJAX, keeps the visitor on the page
   (function(){
     var f=document.getElementById('scanForm'), m=document.getElementById('scanMsg'), e=document.getElementById('scanEmail');
     if(!f) return;
+    var b=f.querySelector('button[type="submit"]');
     f.addEventListener('submit',function(ev){
       ev.preventDefault();
+      m.style.color='';
       var v=(e.value||'').trim();
-      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ m.style.color='#2a1810'; m.textContent='Enter a valid work email.'; return; }
-      m.textContent='Thanks. Request noted. We’ll be in touch.';
-      f.reset();
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ m.textContent='Enter a valid work email.'; e.focus(); return; }
+      var orig=b.innerHTML;
+      b.disabled=true; b.textContent='Sending…';
+      fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}})
+        .then(function(res){
+          if(res.ok){ m.textContent='Thanks. Request noted. We’ll be in touch.'; f.reset(); return; }
+          return res.json().then(function(d){
+            var msg=(d && d.errors && d.errors[0] && d.errors[0].message) || 'Something went wrong. Please try again.';
+            m.textContent=msg;
+          });
+        })
+        .catch(function(){ m.textContent='Network error. Please try again.'; })
+        .then(function(){ b.disabled=false; b.innerHTML=orig; });
     });
   })();
 </script>
