@@ -22,22 +22,26 @@
     --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
     --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
     --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    /* Apple-design motion: decelerating, physical, interruptible */
+    --ease-out:cubic-bezier(.22,1,.36,1);
+    --ease-io:cubic-bezier(.4,0,.2,1);
+    --spring:cubic-bezier(.34,1.28,.5,1);
     color-scheme:light;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--paper);color:var(--fg);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{margin:0;background:var(--paper);color:var(--fg);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-optical-sizing:auto;overflow-x:hidden}
   img{max-width:100%}
   a{color:inherit}
   .wrap{max-width:1140px;margin:0 auto;padding-inline:24px}
   @media(max-width:560px){.wrap{padding-inline:18px}}
 
   .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--terra)}
-  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:.98;letter-spacing:.004em;margin:0;text-wrap:balance}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:.98;letter-spacing:.004em;margin:0;text-wrap:balance;font-optical-sizing:auto}
   .serif-it{font-family:var(--serif);font-style:italic}
 
   /* ---------- header ---------- */
-  .site-head{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .site-head{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--paper) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
   .site-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
   .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
   .brand svg{width:30px;height:30px;flex:none}
@@ -49,7 +53,7 @@
   nav.main a.btn--solid{color:#fff}
   nav.main a.btn--solid:hover{color:#fff}
   @media(max-width:860px){nav.main .lnk{display:none}}
-  .btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .12s ease,background .15s ease,color .15s ease}
+  .btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .32s var(--spring),background .22s var(--ease-io),color .22s var(--ease-io),box-shadow .3s var(--ease-io)}
   .btn--solid{background:var(--terra);color:#fff}
   .btn--solid:hover{background:var(--terra2);transform:translateY(-1px)}
   .btn--ghost{background:none;border-color:var(--line);color:var(--fg)}
@@ -201,7 +205,30 @@
   footer nav a:hover{color:var(--fgd)}
   footer .legal{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:44px;padding-top:22px;border-top:1px solid var(--lined);font-family:var(--mono);font-size:.66rem;letter-spacing:.06em}
 
-  @media (prefers-reduced-motion: reduce){*{animation:none!important;scroll-behavior:auto}}
+  /* Apple-design pass: physical feedback, depth, focus, entrance, reveal */
+  .tile,.cap-card,.pcard{transition:transform .45s var(--ease-out),box-shadow .45s var(--ease-out),border-color .3s var(--ease-io)}
+  .tile:hover,.cap-card:hover,.pcard:hover{transform:translateY(-4px);box-shadow:0 20px 44px -26px rgba(28,24,19,.5);border-color:var(--line-strong)}
+  .sec--ink .tile:hover{box-shadow:0 24px 50px -24px rgba(0,0,0,.6)}
+  .split .ph,.field .ph{transition:transform .5s var(--ease-out),box-shadow .5s var(--ease-out)}
+  .split .ph:hover,.field .ph:hover{transform:translateY(-3px);box-shadow:0 26px 54px -30px rgba(28,24,19,.45)}
+  .btn:active{transform:scale(.96)}
+  a:focus-visible,button:focus-visible,input:focus-visible,.btn:focus-visible{outline:2px solid var(--terra);outline-offset:3px;border-radius:7px}
+  /* staggered hero entrance (CSS-only, plays once; disabled under reduced motion) */
+  .hero .inner>*{animation:tgRise .95s var(--ease-out) both}
+  .hero .eyebrow{animation-delay:.04s}
+  .hero h1{animation-delay:.12s}
+  .hero .sub{animation-delay:.26s}
+  .hero .cta-row{animation-delay:.4s}
+  .hero .trust{animation-delay:.5s}
+  @keyframes tgRise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  /* scroll reveal: JS tags only below-fold blocks with .pre, so no flash and no hidden content without JS */
+  .pre{opacity:0;transform:translateY(24px);transition:opacity .75s var(--ease-out),transform .75s var(--ease-out),filter .75s var(--ease-out)}
+  .pre.in{opacity:1;transform:none}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .pre,.hero .inner>*{opacity:1!important;transform:none!important}
+  }
 </style>
 </head>
 <body>
@@ -494,6 +521,26 @@
       s.style.background=colors[idx];
       g.appendChild(s);
     }
+  })();
+
+  // Apple-design scroll reveal: physical, interruptible, and safe (below-fold only)
+  (function(){
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if(!('IntersectionObserver' in window)) return;
+    var sel=['.sec-head','.lede','.tiles>*','.caps>*','.steps>*','.dash>*','.proof>*',
+             '.band .wrap>*','.split .ph','.field .ph','.vision .eyebrow','.vision h2','.vision .lede','.cta .wrap>*'].join(',');
+    var vh=window.innerHeight||800, i=0;
+    document.querySelectorAll(sel).forEach(function(el){
+      var r=el.getBoundingClientRect();
+      if(r.top > vh*0.82){ el.classList.add('pre'); el.style.transitionDelay=(Math.min(i%4,3)*0.06)+'s'; i++; }
+    });
+    var io=new IntersectionObserver(function(ents){
+      ents.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    },{rootMargin:'0px 0px -7% 0px',threshold:0.12});
+    document.querySelectorAll('.pre').forEach(function(el){ io.observe(el); });
+    // failsafe: never leave anything hidden
+    setTimeout(function(){ document.querySelectorAll('.pre:not(.in)').forEach(function(el){ el.classList.add('in'); }); }, 2600);
+    window.addEventListener('pagehide',function(){ document.querySelectorAll('.pre').forEach(function(el){el.classList.add('in');}); });
   })();
 
   // CTA form: posts to Formspree via AJAX, keeps the visitor on the page
